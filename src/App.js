@@ -5,6 +5,9 @@ import Figure from './components/Figure';
 import Header from './components/Header'
 import Word from './components/Word';
 import WrongLetters from './components/WrongLetters';
+import {showNotification as show} from './helpers/helpers'
+import Notification from './helpers/Notification';
+import Popup from './helpers/Popup';
 
 const words = ['application', 'programming', 'interface', 'react']
 
@@ -14,6 +17,7 @@ function App() {
   const [playable, setPlayable] = useState(true)
   const [correctLetters, setCorrectLetters] = useState([])
   const [wrongLetters, setWrongLetters] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
    const handleKeydown = event => {
@@ -26,13 +30,13 @@ function App() {
            setCorrectLetters(currentLetters => [...currentLetters, letter])
          }
          else{
-           // show notification
+           show(setShowNotification)
          }
         } else{
            if( !wrongLetters.includes(letter)){
              setWrongLetters(wrongLetters => [...wrongLetters, letter])
            } else{
-             // show notification
+            show(setShowNotification)
            }
          }
        }
@@ -41,6 +45,16 @@ function App() {
 
    return () => window.removeEventListener('keydown', handleKeydown)
   }, [correctLetters, wrongLetters, playable])
+
+  function playAgain(){
+    setPlayable(true)
+
+    setCorrectLetters([])
+    setWrongLetters([])
+
+    const random = Math.floor(Math.random() * words.length)
+    selectedWord = words[random]
+  }
   return (
     <div>
         <Header />
@@ -49,6 +63,8 @@ function App() {
            <WrongLetters wrongLetters={wrongLetters}/>
            <Word selectedWord={selectedWord} correctLetters={correctLetters} />
         </div>
+           <Popup correctLetters={correctLetters} playAgain={playAgain} wrongLetters={wrongLetters} selectedWord={selectedWord} setPlayable={setPlayable} />
+           <Notification showNotification={showNotification} />    
        
     </div>
   );
